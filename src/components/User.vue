@@ -6,11 +6,11 @@
     <td v-else><input type="text" class="input-text" v-model="firstname" :disabled="$parent.sending"></td>
     <td :class="{ 'username-error': !this.usernameStatus }">{{ username }}</td>
     <td>{{ password }}</td>
-    <td v-if="status === 1">{{ unit }}</td>
+    <td v-if="status === 1">{{ entryDate }}</td>
     <td v-else>
-      <select v-model="unit" :disabled="$parent.sending" class="input-select">
+      <select v-model="entryDate" :disabled="$parent.sending" class="input-select">
         <option :value="false" disabled>Оберіть клас</option>
-        <option v-for="n in 7" :key="n" :value="'academly-' + (2017 - 3 - n)">{{ (n + 4) + ' - А' }}</option>
+        <option v-for="n in 7" :key="n" :value="(2017 - 3 - n)">{{ (n + 4) + ' - А' }}</option>
       </select>
     </td>
     <td><button class="button button--del" title="Видалити строку" @click="$parent.removeLine(idx)" :disabled="$parent.sending">X</button></td>
@@ -48,7 +48,13 @@ export default {
       },
       set (val) {
         this.user_.firstname = '***' // force set value
-        this.user_.firstname = val.replace(/[^а-щА-ЩЬьЮюЯяЇїІіЄєҐґ]/g, '')
+        var nonUkCleared = val.replace(/[^а-щА-ЩЬьЮюЯяЇїІіЄєҐґ]/g, '')
+        var uppercaseLetters = nonUkCleared.match(/[А-ЩЮЯЇІЄҐ]/g)
+        if (uppercaseLetters.length === 3) {
+          this.user_.firstname = nonUkCleared.slice(nonUkCleared.indexOf(uppercaseLetters[1]))
+        } else {
+          this.user_.firstname = nonUkCleared
+        }
         this.updateUsername()
       }
     },
@@ -58,19 +64,25 @@ export default {
       },
       set (val) {
         this.user_.lastname = '***' // force set value
-        this.user_.lastname = val.replace(/[^а-щА-ЩЬьЮюЯяЇїІіЄєҐґ]/g, '')
+        var nonUkCleared = val.replace(/[^а-щА-ЩЬьЮюЯяЇїІіЄєҐґ]/g, '')
+        var uppercaseLetters = nonUkCleared.match(/[А-ЩЮЯЇІЄҐ]/g)
+        if (uppercaseLetters.length > 1) {
+          this.user_.lastname = nonUkCleared.substr(0, nonUkCleared.indexOf(uppercaseLetters[1]))
+        } else {
+          this.user_.lastname = nonUkCleared
+        }
         this.updateUsername()
       }
     },
     password () {
       return this.user_.password
     },
-    unit: {
+    entryDate: {
       get () {
-        return this.user_.unit
+        return this.user_.entryDate
       },
       set (val) {
-        this.user_.unit = val
+        this.user_.entryDate = val
       }
     },
     username () {

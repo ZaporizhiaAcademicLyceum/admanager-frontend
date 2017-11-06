@@ -1,10 +1,25 @@
 <template>
   <div class="container">
     <div class="row">
-      <h1>Додавання користувачів</h1>
+      <div class="col">
+        <h1>Додавання користувачів</h1>
+      </div>
     </div>
     <div class="row">
-      <div class="col-sm">
+      <div class="col"></div>      
+      <div class="col-auto">
+        <div class="school__btns">
+          <label class="button button--school" :class="{ 'is-active': (school === 'academly') }" for="school-academly">Академічний ліцей</label>
+          <label class="button button--school" :class="{ 'is-active': (school === 'real') }" for="school-real">Частная школа &laquo;РЕАЛ&raquo;</label>
+        </div>
+        <div style="display: none;">
+          <input v-model="school" type="radio" value="academly" id="school-academly">
+          <input v-model="school" type="radio" value="real" id="school-real">
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
         <table>
           <thead>
             <tr>
@@ -28,12 +43,13 @@
       <button class="button button--adusers" @click="addUsers()" :disabled="sending">Додати користувачів</button>
     </div>
     <div class="row">
-      <div class="col-sm">
+      <div class="col">
         <input type="password" class="input-text" v-model="secretkey" placeholder="Ключ доступу" @focus="secretkeyError = 0" @input="secretkeyError = 0">
         <div v-if="secretkeyError === 1" class="secretkey-error">Схоже, що ви забули вказати ключ доступу</div>
         <div v-else-if="secretkeyError === 2" class="secretkey-error">Ключ доступу не вірний!</div>
       </div>
     </div>
+    <!-- div class="row"><pre>{{ $data }}</pre></div -->
   </div>
 </template>
 
@@ -60,6 +76,7 @@ export default {
       sending: false,
       secretkey: '',
       secretkeyError: 0,
+      school: 'academly'
     }
   },
   created () {
@@ -90,7 +107,7 @@ export default {
         }
 
         var self = this
-        if (!user.username.length || !user.unit) {
+        if (!user.username.length || !user.entryDate) {
           user.status = Status.Error
           user.msg = "Заповніть усі поля"
           return resolve(self.addNextUser(idx + 1))
@@ -101,7 +118,7 @@ export default {
               firstname: user.firstname,
               lastname: user.lastname,
               password: user.password,
-              unit: user.unit,
+              unit: this.school + '-' + user.entryDate,
               username: user.username
             },
             secretkey: this.secretkey
@@ -131,9 +148,9 @@ export default {
         firstname: '',
         lastname: '',
         password: this.generatePassword(6),
-        unit: false,
+        entryDate: false,
         username: '',
-        status: 0,
+        status: Status.Initial,
         msg: '',
         vkey: ++this.vkey
       })
@@ -247,5 +264,34 @@ th, td {
   font-size: 0.875rem;
   font-style: italic;
   color: #DD2C00;
+}
+
+.button--school {
+  background: transparent;
+  border: 1px solid #673AB7;
+  font-size: 1rem;
+  line-height: 32px;
+  height: 32px;
+  padding: 0 12px;
+}
+
+.button--school.is-active {
+  background: #673AB7;
+  color: #EDE7F6;
+}
+
+.button--school:first-child {
+  border-radius: 2px 0 0 2px;
+  border-right: none;
+}
+
+.button--school:last-child {
+  border-radius: 0 2px 2px 0;
+  border-left: none;
+}
+
+.school__btns {
+  display: flex;
+  flex-direction: row;
 }
 </style>
