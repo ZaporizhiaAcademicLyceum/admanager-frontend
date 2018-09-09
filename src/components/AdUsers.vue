@@ -6,7 +6,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="col"></div>      
+      <div class="col"></div>
       <div class="col-auto">
         <div class="school__btns">
           <label class="button button--school" :class="{ 'is-active': (school === 'academly') }" for="school-academly">Академічний ліцей</label>
@@ -244,7 +244,6 @@ th, td {
   opacity: 0.6;
   cursor: default;
 }
-
 
 .button--addline,
 .button--adusers {

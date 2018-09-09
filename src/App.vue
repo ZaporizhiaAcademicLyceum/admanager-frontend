@@ -1,17 +1,22 @@
 <template>
   <div id="app">
-    <router-view/>
+    <AdUsers />
   </div>
 </template>
 
 <script>
+import AdUsers from './components/AdUsers'
+
 export default {
-  name: 'app'
+  name: 'app',
+  components: {
+    AdUsers
+  }
 }
 </script>
 
 <style src="./assets/style.css"></style>
-<style>
+<style lang="scss">
 #app {
   margin-top: 48px;
 }

@@ -24,8 +24,8 @@
 </template>
 
 <script>
-var mapEnFromUa = ["a", "b", "v", "g", "g", "d", "e", "ye", "zh", "z", "y", "i", "yi", "y", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u", "f", "h", "ts", "ch", "sh", "sh",  "", "yu", "ya"];
-const mapUa     = ["а", "б", "в", "г", "ґ", "д", "е",  "є",  "ж", "з", "и", "і",  "ї", "й", "к", "л", "м", "н", "о", "п", "р", "с", "т", "у", "ф", "х",  "ц",  "ч",  "ш",  "щ", "ь",  "ю",  "я"];
+var mapEnFromUa = ['a', 'b', 'v', 'g', 'g', 'd', 'e', 'ye', 'zh', 'z', 'y', 'i', 'yi', 'y', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'f', 'h', 'ts', 'ch', 'sh', 'sh', '', 'yu', 'ya']
+const mapUa = ['а', 'б', 'в', 'г', 'ґ', 'д', 'е', 'є', 'ж', 'з', 'и', 'і', 'ї', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ь', 'ю', 'я']
 
 export default {
   name: 'user-object',
@@ -118,17 +118,15 @@ export default {
     },
     translitStr (strIn) {
       strIn = strIn.toLowerCase()
-      var out = ""
-      for(var i = 0; i < strIn.length; ++i)
-      {
+      var out = ''
+      for (var i = 0; i < strIn.length; ++i) {
         var currentChar = strIn[i]
         var churNum = -1
-        if ((churNum = mapUa.indexOf(currentChar)) >= 0)
-        {
-          out += mapEnFromUa[churNum];
+        if ((churNum = mapUa.indexOf(currentChar)) >= 0) {
+          out += mapEnFromUa[churNum]
         }
       }
-      return out;
+      return out
     }
   }
 }
