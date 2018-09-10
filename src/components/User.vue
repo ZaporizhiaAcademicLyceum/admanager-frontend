@@ -1,29 +1,38 @@
 <template>
   <tr>
-    <td v-if="status === 1">{{ lastname }}</td>
-    <td v-else><input type="text" class="input-text" v-model="lastname" autofocus :disabled="$parent.sending"></td>
-    <td v-if="status === 1">{{ firstname }}</td>
-    <td v-else><input type="text" class="input-text" v-model="firstname" :disabled="$parent.sending"></td>
-    <td :class="{ 'username-error': !this.usernameStatus }">{{ username }}</td>
+    <td v-if="status === $userStatus.Succsess">{{ lastname }}</td>
+    <td v-else><input type="text" class="input-text" v-model="lastname" placeholder="Іванов" autofocus :disabled="$parent.sending"></td>
+
+    <td v-if="status === $userStatus.Succsess">{{ firstname }}</td>
+    <td v-else><input type="text" class="input-text" v-model="firstname" placeholder="ТарасМаксимович" :disabled="$parent.sending"></td>
+
+    <td v-if="usernameHasError" class="username-error">Недостатньо даних</td>
+    <td v-else>{{ username }}</td>
+
     <td>{{ password }}</td>
-    <td v-if="status === 1">{{ entryDate }}</td>
+
+    <td v-if="status === $userStatus.Succsess">{{ entryDate }}</td>
     <td v-else>
       <select v-model="entryDate" :disabled="$parent.sending" class="input-select">
         <option :value="false" disabled>Оберіть клас</option>
-        <option v-for="n in 7" :key="n" :value="(2017 - 3 - n)">{{ (n + 4) + ' - А' }}</option>
+        <option v-for="n in 7" :key="n" :value="(academicYear - 3 - n)">{{ (n + 4) + ' - А' }}</option>
       </select>
     </td>
+
     <td><button class="button button--del" title="Видалити строку" @click="$parent.removeLine(idx)" :disabled="$parent.sending">X</button></td>
+
     <td>
-      <span v-if="status === 0" tip="Редагування рядка" class="tooltip">Ред.</span>
-      <span v-else-if="status === 1" tip="Учень додан до ActiveDirectory" class="tooltip tooltip--success">Успіх</span>
-      <span v-else-if="status === 2" :tip="msg" class="tooltip tooltip--error">Помилка</span>
-      <span v-else-if="status === 3" tip="Сервер оброблює запит" class="tooltip">Обробка</span>
+      <span v-if="status === $userStatus.Initial" tip="Редагування рядка" class="tooltip">Ред.</span>
+      <span v-else-if="status === $userStatus.Succsess" tip="Учень додан до ActiveDirectory" class="tooltip tooltip--success">Успіх</span>
+      <span v-else-if="status === $userStatus.Error" :tip="msg" class="tooltip tooltip--error">Помилка</span>
+      <span v-else-if="status === $userStatus.Pending" tip="Сервер оброблює запит" class="tooltip">Обробка</span>
     </td>
   </tr>
 </template>
 
 <script>
+import { UserStatus } from './status'
+
 var mapEnFromUa = ['a', 'b', 'v', 'g', 'g', 'd', 'e', 'ye', 'zh', 'z', 'y', 'i', 'yi', 'y', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'f', 'h', 'ts', 'ch', 'sh', 'sh', '', 'yu', 'ya']
 const mapUa = ['а', 'б', 'в', 'г', 'ґ', 'д', 'е', 'є', 'ж', 'з', 'и', 'і', 'ї', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ь', 'ю', 'я']
 
@@ -37,23 +46,35 @@ export default {
   },
   data () {
     return {
-      user_: this.$parent.users[this.idx],
-      usernameStatus: false
+      user_: this.$parent.users[this.idx]
     }
   },
   computed: {
+    academicYear () {
+      // TODO: [06 - 12], [01 - 05]
+      return 2018
+    },
     firstname: {
       get () {
         return this.user_.firstname
       },
       set (val) {
         this.user_.firstname = '***' // force set value
+
         var nonUkCleared = val.replace(/[^а-щА-ЩЬьЮюЯяЇїІіЄєҐґ]/g, '')
-        var uppercaseLetters = nonUkCleared.match(/[А-ЩЮЯЇІЄҐ]/g)
-        if (uppercaseLetters.length === 3) {
-          this.user_.firstname = nonUkCleared.slice(nonUkCleared.indexOf(uppercaseLetters[1]))
+        if (nonUkCleared.length) {
+          var uppercaseLetters = nonUkCleared.match(/[А-ЩЮЯЇІЄҐ]/g)
+          if (uppercaseLetters) {
+            if (uppercaseLetters.length === 3) {
+              this.user_.firstname = nonUkCleared.slice(nonUkCleared.indexOf(uppercaseLetters[1]))
+            } else {
+              this.user_.firstname = nonUkCleared
+            }
+          } else {
+            this.user_.firstname = nonUkCleared.charAt(0).toUpperCase() + nonUkCleared.substr(1)
+          }
         } else {
-          this.user_.firstname = nonUkCleared
+          this.user_.firstname = ''
         }
         this.updateUsername()
       }
@@ -64,12 +85,22 @@ export default {
       },
       set (val) {
         this.user_.lastname = '***' // force set value
+
         var nonUkCleared = val.replace(/[^а-щА-ЩЬьЮюЯяЇїІіЄєҐґ]/g, '')
-        var uppercaseLetters = nonUkCleared.match(/[А-ЩЮЯЇІЄҐ]/g)
-        if (uppercaseLetters.length > 1) {
-          this.user_.lastname = nonUkCleared.substr(0, nonUkCleared.indexOf(uppercaseLetters[1]))
+        if (nonUkCleared.length) {
+          var uppercaseLetters = nonUkCleared.match(/[А-ЩЮЯЇІЄҐ]/g)
+          if (uppercaseLetters) {
+            if (uppercaseLetters.length > 1) {
+              // assume on Ctrl+V: IvashenkoMaksymMykolayoych (spaces removed by nonUkCleared)
+              this.user_.lastname = nonUkCleared.substr(0, nonUkCleared.indexOf(uppercaseLetters[1]))
+            } else {
+              this.user_.lastname = nonUkCleared
+            }
+          } else {
+            this.user_.lastname = nonUkCleared.charAt(0).toUpperCase() + nonUkCleared.substr(1)
+          }
         } else {
-          this.user_.lastname = nonUkCleared
+          this.user_.lastname = ''
         }
         this.updateUsername()
       }
@@ -86,23 +117,19 @@ export default {
       }
     },
     username () {
-      if (!this.user_.username.length) {
-        this.usernameStatus = false
-        return 'Недостатньо даних'
-      } else {
-        this.usernameStatus = true
-        return this.user_.username
-      }
+      return this.user_.username
     },
-    status: {
-      get () {
-        return this.user_.status
-      }
+    usernameHasError () {
+      return this.username.length < 1
     },
-    msg: {
-      get () {
-        return this.user_.msg
-      }
+    status () {
+      return this.user_.status
+    },
+    $userStatus () {
+      return UserStatus
+    },
+    msg () {
+      return this.user_.msg
     }
   },
   methods: {
@@ -126,6 +153,7 @@ export default {
           out += mapEnFromUa[churNum]
         }
       }
+
       return out
     }
   }

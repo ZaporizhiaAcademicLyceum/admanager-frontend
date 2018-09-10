@@ -49,20 +49,14 @@
         <div v-else-if="secretkeyError === 2" class="secretkey-error">Ключ доступу не вірний!</div>
       </div>
     </div>
-    <!-- div class="row"><pre>{{ $data }}</pre></div -->
+    <!--div class="row"><pre>{{ $data }}</pre></div-->
   </div>
 </template>
 
 <script>
 import User from './User'
 import axios from 'axios'
-
-const Status = {
-  Initial: 0,
-  Succsess: 1,
-  Error: 2,
-  Pending: 3
-}
+import { UserStatus } from './status'
 
 export default {
   name: 'ad-users',
@@ -96,23 +90,23 @@ export default {
         }
       }
     },
-    addNextUser(idx) {
+    addNextUser (idx) {
       return new Promise((resolve, reject) => {
         var user = this.users[idx]
         if (idx > this.users.length - 1) {
           return resolve() // end reached
         }
-        if (user.status === Status.Succsess) {
+        if (user.status === UserStatus.Succsess) {
           return resolve(this.addNextUser(idx + 1))
         }
 
         var self = this
         if (!user.username.length || !user.entryDate) {
-          user.status = Status.Error
-          user.msg = "Заповніть усі поля"
+          user.status = UserStatus.Error
+          user.msg = 'Заповніть усі поля'
           return resolve(self.addNextUser(idx + 1))
         } else {
-          user.status = Status.Pending
+          user.status = UserStatus.Pending
           return axios.post('/api/aduser', {
             user: {
               firstname: user.firstname,
@@ -123,21 +117,21 @@ export default {
             },
             secretkey: this.secretkey
           }).then((response) => {
-            if ((response.data).data === "OK") {
-              user.status = Status.Succsess
+            if ((response.data).data === 'OK') {
+              user.status = UserStatus.Succsess
             } else {
-              if ((response.data).data === "ERROR: secretkey") {
+              if ((response.data).data === 'ERROR: secretkey') {
                 self.secretkeyError = 2
                 return resolve()
               } else {
-                user.status = Status.Error
+                user.status = UserStatus.Error
                 user.msg = (response.data).data
               }
             }
             return resolve(self.addNextUser(idx + 1))
           }).catch(() => {
-            user.status = Status.Error
-            user.msg = "Невідома помилка (дивіться F12)"
+            user.status = UserStatus.Error
+            user.msg = 'Невідома помилка (дивіться F12)'
             return resolve(self.addNextUser(idx + 1))
           })
         }
@@ -150,24 +144,22 @@ export default {
         password: this.generatePassword(6),
         entryDate: false,
         username: '',
-        status: Status.Initial,
+        status: UserStatus.Initial,
         msg: '',
         vkey: ++this.vkey
       })
     },
     removeLine (idx) {
-      console.log(idx)
       this.users.splice(idx, 1)
     },
     generatePassword (length) {
-      const chars = "abcdefghijklmnopqrstuvwxyz"
-      const nums = "1234567890"
-      var pass = ""
+      // const chars = 'abcdefghijklmnopqrstuvwxyz'
+      const nums = '1234567890'
+      var pass = ''
 
       // charNum = Math.floor(Math.random() * 26);
       // pass += chars.charAt(charNum);
-      for (var i = 0; i < length; i++)
-      {
+      for (var i = 0; i < length; i++) {
         var charNum = Math.floor(Math.random() * 10)
         pass += nums.charAt(charNum)
       }
