@@ -52,7 +52,7 @@ export default {
   computed: {
     academicYear () {
       // TODO: [06 - 12], [01 - 05]
-      return 2018
+      return 2019
     },
     firstname: {
       get () {
