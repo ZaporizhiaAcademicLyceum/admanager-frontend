@@ -39,6 +39,7 @@ const lcChars = /[а-щьюяєіїґ’']/
 
 const lastnameRe = new RegExp(`^${ucChars.source}${lcChars.source}+`)
 const firstnamePatronymicRe = new RegExp(`${ucChars.source}${lcChars.source}+${ucChars.source}${lcChars.source}+$`)
+const fpInFlpRe = new RegExp(`${lastnameRe.source}(${firstnamePatronymicRe.source})`)
 const ucCharsInFirstnameRe = new RegExp(`^(${ucChars.source})${lcChars.source}+(${ucChars.source})${lcChars.source}+$`)
 
 function ucfirst (value) {
@@ -99,6 +100,11 @@ export default {
           const lastname = nonUkCleared.match(lastnameRe)
           if (lastname) {
             this.user_.lastname = lastname[0]
+
+            const fp = nonUkCleared.match(fpInFlpRe)
+            if (fp) {
+              this.user_.firstname = fp[1]
+            }
           } else {
             this.user_.lastname = ucfirst(nonUkCleared)
           }
