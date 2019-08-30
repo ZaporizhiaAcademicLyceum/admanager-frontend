@@ -1,10 +1,10 @@
 <template>
   <tr>
     <td v-if="status === $userStatus.Succsess">{{ lastname }}</td>
-    <td v-else><input type="text" class="input-text" v-model="lastname" placeholder="Іванов" autofocus :disabled="$parent.sending"></td>
+    <td v-else><input type="text" class="input-text" v-model="lastname" placeholder="Іванов" autofocus autocomplete="off" :disabled="$parent.sending"></td>
 
     <td v-if="status === $userStatus.Succsess">{{ firstname }}</td>
-    <td v-else><input type="text" class="input-text" v-model="firstname" placeholder="ТарасМаксимович" :disabled="$parent.sending"></td>
+    <td v-else><input type="text" class="input-text" v-model="firstname" placeholder="ТарасМаксимович" autocomplete="off" :disabled="$parent.sending"></td>
 
     <td v-if="usernameHasError" class="username-error">Недостатньо даних</td>
     <td v-else>{{ username }}</td>

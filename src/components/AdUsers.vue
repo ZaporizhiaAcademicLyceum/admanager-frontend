@@ -44,7 +44,7 @@
     </div>
     <div class="row">
       <div class="col">
-        <input type="password" class="input-text" v-model="secretkey" placeholder="Ключ доступу" @focus="secretkeyError = 0" @input="secretkeyError = 0">
+        <input type="password" class="input-text" v-model="secretkey" placeholder="Ключ доступу" @focus="secretkeyError = 0" @input="secretkeyError = 0" autocomplete="current-password">
         <div v-if="secretkeyError === 1" class="secretkey-error">Схоже, що ви забули вказати ключ доступу</div>
         <div v-else-if="secretkeyError === 2" class="secretkey-error">Ключ доступу не вірний!</div>
       </div>
