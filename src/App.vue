@@ -16,7 +16,7 @@ export default {
 </script>
 
 <style src="./assets/style.css"></style>
-<style lang="scss">
+<style>
 #app {
   margin-top: 48px;
 }
