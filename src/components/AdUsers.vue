@@ -20,6 +20,20 @@
     </div>
     <div class="row">
       <div class="col">
+        <div class="help-block">
+          <h3 class="help-block__title">Підказка</h3>
+          <ul style="margin: 0; max-width: 780px;">
+            <li>Ви можете вставляти(<kbd>Ctrl+V</kbd>) у поля повністю ПІБ (Язанський Петро Охримович), необхідні дані витягнуться автоматично</li>
+            <li>Поле "Ім’я По батькові" не містить пробілу, це не помилка</li>
+            <li>Якщо натиснути кнопку "Додати строку", а потім Enter - ви швидше додасте нові строки</li>
+            <li>Після додавання можна виділити усі строки та вставити в Excel</li>
+            <li>Поточний навчальний рік <span style="font-weight: 600;">2019-2020</span>, будь ласка, не додавайте учнів на 2020-2021 рік до оновлення сайту, або додавайте, АЛЕ пам’ятайте, що необхідно обрати на один клас менше</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
         <table>
           <thead>
             <tr>
@@ -284,5 +298,18 @@ th, td {
 .school__btns {
   display: flex;
   flex-direction: row;
+}
+
+.help-block {
+  border: 1px solid #a5d6a7;
+  padding: 16px;
+  background: #e8f5e9;
+  color: #1b5e20;
+  margin-top: 16px;
+}
+
+.help-block__title {
+  font-size: 16px;
+  font-weight: 600;
 }
 </style>
