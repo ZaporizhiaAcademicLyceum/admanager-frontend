@@ -33,6 +33,20 @@
 <script>
 import { UserStatus } from './status'
 
+const notUkrainian = /[^а-щА-ЩьЬюЮяЯєЄіІїЇґҐ’']+/g
+const ucChars = /[А-ЩЬЮЯЄІЇҐ]/
+const lcChars = /[а-щьюяєіїґ’']/
+
+const _matchUcCharsRe = new RegExp(ucChars, 'g')
+function matchUcChars (value) {
+  return value.match(_matchUcCharsRe)
+}
+
+const _matchUcCharsInFirstnameRe = new RegExp(`^(${ucChars.source})${lcChars.source}+(${ucChars.source})${lcChars.source}+$`)
+function matchUcCharsInFirstname (value) {
+  return value.match(_matchUcCharsInFirstnameRe)
+}
+
 var mapEnFromUa = ['a', 'b', 'v', 'g', 'g', 'd', 'e', 'ye', 'zh', 'z', 'y', 'i', 'yi', 'y', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'f', 'h', 'ts', 'ch', 'sh', 'sh', '', 'yu', 'ya']
 const mapUa = ['а', 'б', 'в', 'г', 'ґ', 'д', 'е', 'є', 'ж', 'з', 'и', 'і', 'ї', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ь', 'ю', 'я']
 
@@ -61,9 +75,9 @@ export default {
       set (val) {
         this.user_.firstname = '***' // force set value
 
-        var nonUkCleared = val.replace(/[^а-щА-ЩЬьЮюЯяЇїІіЄєҐґ]/g, '')
+        var nonUkCleared = val.replace(notUkrainian, '')
         if (nonUkCleared.length) {
-          var uppercaseLetters = nonUkCleared.match(/[А-ЩЮЯЇІЄҐ]/g)
+          var uppercaseLetters = matchUcChars(nonUkCleared)
           if (uppercaseLetters) {
             if (uppercaseLetters.length === 3) {
               this.user_.firstname = nonUkCleared.slice(nonUkCleared.indexOf(uppercaseLetters[1]))
@@ -86,9 +100,9 @@ export default {
       set (val) {
         this.user_.lastname = '***' // force set value
 
-        var nonUkCleared = val.replace(/[^а-щА-ЩЬьЮюЯяЇїІіЄєҐґ]/g, '')
+        var nonUkCleared = val.replace(notUkrainian, '')
         if (nonUkCleared.length) {
-          var uppercaseLetters = nonUkCleared.match(/[А-ЩЮЯЇІЄҐ]/g)
+          var uppercaseLetters = matchUcChars(nonUkCleared)
           if (uppercaseLetters) {
             if (uppercaseLetters.length > 1) {
               // assume on Ctrl+V: IvashenkoMaksymMykolayoych (spaces removed by nonUkCleared)
@@ -134,7 +148,7 @@ export default {
   },
   methods: {
     updateUsername () {
-      var uppercaseLetters = this.firstname.match(/^([А-ЩЮЯЇІЄҐ])[а-щьюяїієґ]+([А-ЩЮЯЇІЄҐ])[а-щьюяїієґ]+$/)
+      var uppercaseLetters = matchUcCharsInFirstname(this.firstname)
       if (!this.lastname.length || !uppercaseLetters || (uppercaseLetters.length !== 3)) {
         this.user_.username = ''
       } else {
