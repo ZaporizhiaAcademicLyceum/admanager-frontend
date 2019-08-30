@@ -37,14 +37,12 @@ const notUkrainian = /[^а-щА-ЩьЬюЮяЯєЄіІїЇґҐ’']+/g
 const ucChars = /[А-ЩЬЮЯЄІЇҐ]/
 const lcChars = /[а-щьюяєіїґ’']/
 
-const _matchUcCharsRe = new RegExp(ucChars, 'g')
-function matchUcChars (value) {
-  return value.match(_matchUcCharsRe)
-}
+const lastnameRe = new RegExp(`^${ucChars.source}${lcChars.source}+`)
+const firstnamePatronymicRe = new RegExp(`${ucChars.source}${lcChars.source}+${ucChars.source}${lcChars.source}+$`)
+const ucCharsInFirstnameRe = new RegExp(`^(${ucChars.source})${lcChars.source}+(${ucChars.source})${lcChars.source}+$`)
 
-const _matchUcCharsInFirstnameRe = new RegExp(`^(${ucChars.source})${lcChars.source}+(${ucChars.source})${lcChars.source}+$`)
-function matchUcCharsInFirstname (value) {
-  return value.match(_matchUcCharsInFirstnameRe)
+function ucfirst (value) {
+  return value.charAt(0).toUpperCase() + value.substr(1)
 }
 
 var mapEnFromUa = ['a', 'b', 'v', 'g', 'g', 'd', 'e', 'ye', 'zh', 'z', 'y', 'i', 'yi', 'y', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'f', 'h', 'ts', 'ch', 'sh', 'sh', '', 'yu', 'ya']
@@ -77,15 +75,11 @@ export default {
 
         var nonUkCleared = val.replace(notUkrainian, '')
         if (nonUkCleared.length) {
-          var uppercaseLetters = matchUcChars(nonUkCleared)
-          if (uppercaseLetters) {
-            if (uppercaseLetters.length === 3) {
-              this.user_.firstname = nonUkCleared.slice(nonUkCleared.indexOf(uppercaseLetters[1]))
-            } else {
-              this.user_.firstname = nonUkCleared
-            }
+          const fp = nonUkCleared.match(firstnamePatronymicRe)
+          if (fp) {
+            this.user_.firstname = fp[0]
           } else {
-            this.user_.firstname = nonUkCleared.charAt(0).toUpperCase() + nonUkCleared.substr(1)
+            this.user_.firstname = ucfirst(nonUkCleared)
           }
         } else {
           this.user_.firstname = ''
@@ -102,16 +96,11 @@ export default {
 
         var nonUkCleared = val.replace(notUkrainian, '')
         if (nonUkCleared.length) {
-          var uppercaseLetters = matchUcChars(nonUkCleared)
-          if (uppercaseLetters) {
-            if (uppercaseLetters.length > 1) {
-              // assume on Ctrl+V: IvashenkoMaksymMykolayoych (spaces removed by nonUkCleared)
-              this.user_.lastname = nonUkCleared.substr(0, nonUkCleared.indexOf(uppercaseLetters[1]))
-            } else {
-              this.user_.lastname = nonUkCleared
-            }
+          const lastname = nonUkCleared.match(lastnameRe)
+          if (lastname) {
+            this.user_.lastname = lastname[0]
           } else {
-            this.user_.lastname = nonUkCleared.charAt(0).toUpperCase() + nonUkCleared.substr(1)
+            this.user_.lastname = ucfirst(nonUkCleared)
           }
         } else {
           this.user_.lastname = ''
@@ -148,7 +137,7 @@ export default {
   },
   methods: {
     updateUsername () {
-      var uppercaseLetters = matchUcCharsInFirstname(this.firstname)
+      var uppercaseLetters = this.firstname.match(ucCharsInFirstnameRe)
       if (!this.lastname.length || !uppercaseLetters || (uppercaseLetters.length !== 3)) {
         this.user_.username = ''
       } else {
