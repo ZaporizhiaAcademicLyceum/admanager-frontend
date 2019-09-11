@@ -15,7 +15,7 @@
     <td v-else>
       <select v-model="entryDate" :disabled="$parent.sending" class="input-select">
         <option :value="false" disabled>Оберіть клас</option>
-        <option v-for="n in 7" :key="n" :value="(academicYear - 3 - n)">{{ (n + 4) + ' - А' }}</option>
+        <option v-for="grade in grades" :key="grade.unit" :value="grade.unit">{{ grade.value }}</option>
       </select>
     </td>
 
@@ -63,9 +63,20 @@ export default {
     }
   },
   computed: {
-    academicYear () {
+    grades () {
       // TODO: [06 - 12], [01 - 05]
-      return 2019
+      const academicYear = 2019 + 1
+
+      return [
+        { value: '5 - А', unit: `${academicYear - 5}` },
+        { value: '5 - Б', unit: `${academicYear - 5}-b` },
+        { value: '6 - А', unit: `${academicYear - 6}` },
+        { value: '7 - А', unit: `${academicYear - 7}` },
+        { value: '8 - А', unit: `${academicYear - 8}` },
+        { value: '9 - А', unit: `${academicYear - 9}` },
+        { value: '10 - А', unit: `${academicYear - 10}` },
+        { value: '11 - А', unit: `${academicYear - 11}` }
+      ]
     },
     firstname: {
       get () {
